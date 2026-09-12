@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RidosaurusApp - QuizApp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <button id="themeToggle" class="theme-toggle" aria-label="Ganti tampilan terang/gelap" title="Ganti tampilan">
+    <span class="theme-toggle__icon">☾</span>
+  </button>
+
+  <main class="stage">
+
+    <section id="startScreen" class="panel panel--start">
+      <p class="kicker">RidosaurusApp - QuizApp</p>
+      <h1 class="title">Pilih topik kuis<br>yang mau kamu <em>taklukkan.</em></h1>
+      <p class="subtitle">10 soal per kuis, terbagi dari level mudah sampai ahli. Semakin sulit soalnya, semakin besar poinnya.</p>
+
+      <div class="category-grid" id="categoryGrid">
+        <button class="category-card" data-category="html">
+          <span class="category-card__name">HTML</span>
+          <span class="category-card__desc">Struktur &amp; elemen dasar halaman</span>
+          <span class="category-card__score" data-score-for="html" hidden></span>
+        </button>
+        <button class="category-card" data-category="css">
+          <span class="category-card__name">CSS</span>
+          <span class="category-card__desc">Styling, layout, dan tata letak</span>
+          <span class="category-card__score" data-score-for="css" hidden></span>
+        </button>
+        <button class="category-card" data-category="javascript">
+          <span class="category-card__name">JavaScript</span>
+          <span class="category-card__desc">Logika, fungsi, dan interaktivitas</span>
+          <span class="category-card__score" data-score-for="javascript" hidden></span>
+        </button>
+        <button class="category-card" data-category="dom">
+          <span class="category-card__name">DOM</span>
+          <span class="category-card__desc">Manipulasi elemen di browser</span>
+          <span class="category-card__score" data-score-for="dom" hidden></span>
+        </button>
+        <button class="category-card category-card--wide" data-category="full">
+          <span class="category-card__name">Pemrograman Web Utuh</span>
+          <span class="category-card__desc">Campuran soal dari semua topik di atas</span>
+          <span class="category-card__score" data-score-for="full" hidden></span>
+        </button>
+      </div>
+
+      <button id="viewRecordsFromStartBtn" class="btn btn--ghost">Lihat rekor kuis</button>
+    </section>
+
+    <section id="quizScreen" class="panel panel--quiz" hidden>
+
+      <span class="difficulty-badge" id="difficultyBadge">Mudah · 50 poin</span>
+      <button id="quitQuizBtn" class="quiz-exit-btn" type="button">Menu</button>
+
+      <div class="quiz-head">
+        <p class="question-count" id="questionCount">Soal 1 dari 10</p>
+        <ol class="pips" id="pips" aria-hidden="true"></ol>
+      </div>
+
+      <div class="question-wrap" id="questionWrap">
+        <h2 class="question" id="questionText">—</h2>
+        <div class="options" id="optionsList"></div>
+      </div>
+
+      <div class="quiz-nav">
+        <button id="backBtn" class="btn btn--ghost" disabled>Kembali</button>
+        <button id="nextBtn" class="btn btn--primary" disabled>Lanjut</button>
+      </div>
+
+    </section>
+
+    <section id="resultScreen" class="panel panel--result" hidden>
+      <p class="kicker">Selesai</p>
+      <p class="result-category" id="resultCategory">HTML</p>
+      <p class="result-score" id="resultScore">0/10</p>
+      <p class="result-points" id="resultPoints">0 dari 700 poin</p>
+      <p class="result-message" id="resultMessage">—</p>
+      <p class="result-badge" id="resultBadge" hidden>✦ Rekor baru untuk topik ini!</p>
+      <div class="result-actions">
+        <button id="restartBtn" class="btn btn--primary">Main lagi</button>
+        <button id="changeQuizBtn" class="btn btn--ghost">Pilih kuis lain</button>
+        <button id="viewRecordsFromResultBtn" class="btn btn--ghost">Lihat rekor</button>
+      </div>
+    </section>
+
+    <section id="recordsScreen" class="panel panel--records" hidden>
+      <p class="kicker">Riwayat</p>
+      <h2 class="title title--sm">Rekor kuismu</h2>
+      <div class="records-list" id="recordsList"></div>
+      <button id="backFromRecordsBtn" class="btn btn--ghost">Kembali</button>
+    </section>
+</main>
+
+  <script src="script.js"></script>
+</body>
+</html>
