@@ -1,9 +1,5 @@
 'use strict';
 
-// ==========================================================================
-// Data
-// ==========================================================================
-
 const TIER_META = {
   mudah: { label: 'Mudah', points: 50 },
   menengah: { label: 'Menengah', points: 75 },
@@ -18,7 +14,6 @@ const CATEGORY_META = {
   full: { label: 'Pemrograman Web Utuh' },
 };
 
-// Each real category has exactly 4 mudah, 4 menengah, 2 ahli questions.
 const QUESTION_BANKS = {
   html: {
     mudah: [
@@ -341,10 +336,6 @@ const TIMER_CIRCUMFERENCE = 106.8;
 const RECORDS_KEY = 'kilaskode_records';
 const THEME_KEY = 'kilaskode_theme';
 
-// ==========================================================================
-// State
-// ==========================================================================
-
 const state = {
   categoryKey: null,
   questions: [],
@@ -353,10 +344,6 @@ const state = {
   timerId: null,
   timeLeft: TIME_PER_QUESTION,
 };
-
-// ==========================================================================
-// DOM references
-// ==========================================================================
 
 const startScreen = document.getElementById('startScreen');
 const quizScreen = document.getElementById('quizScreen');
@@ -391,10 +378,6 @@ const viewRecordsFromResultBtn = document.getElementById('viewRecordsFromResultB
 
 const recordsList = document.getElementById('recordsList');
 const backFromRecordsBtn = document.getElementById('backFromRecordsBtn');
-
-// ==========================================================================
-// Utilities
-// ==========================================================================
 
 function shuffle(array) {
   const copy = [...array];
@@ -432,10 +415,6 @@ function getBestForCategory(categoryKey) {
   return records.reduce((best, r) => (r.correct > best.correct ? r : best), records[0]);
 }
 
-// ==========================================================================
-// Theme toggle
-// ==========================================================================
-
 function applyTheme(theme) {
   if (theme === 'light') {
     document.documentElement.setAttribute('data-theme', 'light');
@@ -457,10 +436,6 @@ themeToggle.addEventListener('click', () => {
   applyTheme(next);
   localStorage.setItem(THEME_KEY, next);
 });
-
-// ==========================================================================
-// Start screen: category selection
-// ==========================================================================
 
 function initStartScreen() {
   Object.keys(CATEGORY_META).forEach((key) => {
@@ -500,11 +475,6 @@ changeQuizBtn.addEventListener('click', () => {
   initStartScreen();
 });
 
-// ==========================================================================
-// Timer (per soal, reset tiap pindah soal, tidak jalan untuk soal yang
-// sudah dijawab)
-// ==========================================================================
-
 function startTimer() {
   stopTimer();
   state.timeLeft = TIME_PER_QUESTION;
@@ -522,7 +492,7 @@ function startTimer() {
     if (state.timeLeft <= 0) {
       stopTimer();
       if (!state.answers[state.currentIndex]) {
-        handleAnswer(-1, true); // waktu habis tanpa jawaban -> dihitung salah, lalu auto-lanjut
+        handleAnswer(-1, true); 
       }
     }
   }, 1000);
@@ -549,10 +519,6 @@ function showTimerAsDone() {
   timerNum.textContent = '–';
   timerFill.style.strokeDashoffset = '0';
 }
-
-// ==========================================================================
-// Building a question set
-// ==========================================================================
 
 function buildQuestionSet(categoryKey) {
   const tierPools = { mudah: [], menengah: [], ahli: [] };
@@ -593,10 +559,6 @@ function buildQuestionSet(categoryKey) {
 
   return finalQuestions;
 }
-
-// ==========================================================================
-// Quiz flow
-// ==========================================================================
 
 function startQuiz(categoryKey) {
   state.categoryKey = categoryKey;
@@ -679,11 +641,10 @@ function renderQuestion() {
   updatePips();
 }
 
-// Event delegation: one listener on the container handles all option clicks.
 optionsList.addEventListener('click', (event) => {
   const button = event.target.closest('.option');
   if (!button) return;
-  if (state.answers[state.currentIndex]) return; // already answered
+  if (state.answers[state.currentIndex]) return;
 
   const selectedIndex = Number(button.dataset.index);
   handleAnswer(selectedIndex);
@@ -703,14 +664,11 @@ function handleAnswer(selectedIndex, fromTimeout = false) {
   nextBtn.disabled = false;
 
   if (fromTimeout) {
-    // Beri jeda sebentar supaya warna jawaban benar/salah sempat terlihat,
-    // lalu otomatis lanjut ke soal berikutnya (atau selesaikan kuis).
     setTimeout(advanceAfterTimeout, 1100);
   }
 }
 
 function advanceAfterTimeout() {
-  // Guard: batal auto-lanjut kalau user sudah pindah layar/soal secara manual.
   if (quizScreen.hidden) return;
   if (!state.answers[state.currentIndex]) return;
 
@@ -767,10 +725,6 @@ function quitQuiz() {
   initStartScreen();
 }
 
-// ==========================================================================
-// Result screen
-// ==========================================================================
-
 function finishQuiz() {
   stopTimer();
   let total = 0;
@@ -780,7 +734,7 @@ function finishQuiz() {
 
   state.questions.forEach((q, index) => {
     const answer = state.answers[index];
-    if (answer && answer.timedOut) return; // soal timeout: tidak dihitung sama sekali
+    if (answer && answer.timedOut) return;
 
     total += 1;
     maxPoints += q.points;
@@ -820,10 +774,6 @@ function getResultMessage(correct, total) {
   if (ratio >= 0.5) return 'Lumayan! Masih ada ruang untuk belajar lagi.';
   return 'Terus berlatih, kamu akan lebih baik lain kali.';
 }
-
-// ==========================================================================
-// Records screen
-// ==========================================================================
 
 function openRecords(previousScreen) {
   renderRecords();
@@ -887,10 +837,6 @@ function formatDate(isoString) {
     minute: '2-digit',
   });
 }
-
-// ==========================================================================
-// Init
-// ==========================================================================
 
 initTheme();
 initStartScreen();

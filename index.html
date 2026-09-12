@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kilas Kode — Kuis Web Dev</title>
+  <title>RidosaurusApp - QuizApp</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,10 +16,8 @@
   </button>
 
   <main class="stage">
-
-    <!-- START SCREEN: category picker -->
     <section id="startScreen" class="panel panel--start">
-      <p class="kicker">Kilas Kode</p>
+      <p class="kicker">RidosaurusApp</p>
       <h1 class="title">Pilih topik kuis<br>yang mau kamu <em>taklukkan.</em></h1>
       <p class="subtitle">10 soal per kuis, terbagi dari level mudah sampai ahli. Semakin sulit soalnya, semakin besar poinnya.</p>
 
@@ -54,7 +52,6 @@
       <button id="viewRecordsFromStartBtn" class="btn btn--ghost">Lihat rekor kuis</button>
     </section>
 
-    <!-- QUIZ SCREEN -->
     <section id="quizScreen" class="panel panel--quiz" hidden>
 
       <span class="difficulty-badge" id="difficultyBadge">Mudah · 50 poin</span>
@@ -87,7 +84,6 @@
 
     </section>
 
-    <!-- RESULT SCREEN -->
     <section id="resultScreen" class="panel panel--result" hidden>
       <p class="kicker">Selesai</p>
       <p class="result-category" id="resultCategory">HTML</p>
@@ -102,7 +98,6 @@
       </div>
     </section>
 
-    <!-- RECORDS SCREEN -->
     <section id="recordsScreen" class="panel panel--records" hidden>
       <p class="kicker">Riwayat</p>
       <h2 class="title title--sm">Rekor kuismu</h2>
