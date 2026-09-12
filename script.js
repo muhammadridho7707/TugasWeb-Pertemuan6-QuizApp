@@ -336,6 +336,8 @@ const REAL_CATEGORIES = ['html', 'css', 'javascript', 'dom'];
 const TOTAL_QUESTIONS = 10;
 const TIER_ORDER = ['mudah', 'menengah', 'ahli'];
 const TIER_COUNTS = { mudah: 4, menengah: 4, ahli: 2 };
+const TIME_PER_QUESTION = 15;
+const TIMER_CIRCUMFERENCE = 106.8;
 const RECORDS_KEY = 'kilaskode_records';
 const THEME_KEY = 'kilaskode_theme';
 
@@ -348,6 +350,8 @@ const state = {
   questions: [],
   answers: [],
   currentIndex: 0,
+  timerId: null,
+  timeLeft: TIME_PER_QUESTION,
 };
 
 // ==========================================================================
@@ -365,6 +369,9 @@ const viewRecordsFromStartBtn = document.getElementById('viewRecordsFromStartBtn
 const themeToggle = document.getElementById('themeToggle');
 
 const quitQuizBtn = document.getElementById('quitQuizBtn');
+const timerEl = document.getElementById('timer');
+const timerFill = document.getElementById('timerFill');
+const timerNum = document.getElementById('timerNum');
 const difficultyBadge = document.getElementById('difficultyBadge');
 const questionCount = document.getElementById('questionCount');
 const pipsList = document.getElementById('pips');
@@ -494,6 +501,56 @@ changeQuizBtn.addEventListener('click', () => {
 });
 
 // ==========================================================================
+// Timer (per soal, reset tiap pindah soal, tidak jalan untuk soal yang
+// sudah dijawab)
+// ==========================================================================
+
+function startTimer() {
+  stopTimer();
+  state.timeLeft = TIME_PER_QUESTION;
+  timerEl.classList.remove('is-low', 'is-done');
+  updateTimerDisplay();
+
+  state.timerId = setInterval(() => {
+    state.timeLeft -= 1;
+    updateTimerDisplay();
+
+    if (state.timeLeft <= 4) {
+      timerEl.classList.add('is-low');
+    }
+
+    if (state.timeLeft <= 0) {
+      stopTimer();
+      if (!state.answers[state.currentIndex]) {
+        handleAnswer(-1, true); // waktu habis tanpa jawaban -> dihitung salah, lalu auto-lanjut
+      }
+    }
+  }, 1000);
+}
+
+function stopTimer() {
+  if (state.timerId) {
+    clearInterval(state.timerId);
+    state.timerId = null;
+  }
+}
+
+function updateTimerDisplay() {
+  const clamped = Math.max(state.timeLeft, 0);
+  timerNum.textContent = String(clamped);
+  const ratio = clamped / TIME_PER_QUESTION;
+  timerFill.style.strokeDashoffset = String(TIMER_CIRCUMFERENCE * (1 - ratio));
+}
+
+function showTimerAsDone() {
+  stopTimer();
+  timerEl.classList.remove('is-low');
+  timerEl.classList.add('is-done');
+  timerNum.textContent = '–';
+  timerFill.style.strokeDashoffset = '0';
+}
+
+// ==========================================================================
 // Building a question set
 // ==========================================================================
 
@@ -610,6 +667,9 @@ function renderQuestion() {
 
   if (existingAnswer) {
     lockOptions(existingAnswer.selectedIndex);
+    showTimerAsDone();
+  } else {
+    startTimer();
   }
 
   backBtn.disabled = state.currentIndex === 0;
@@ -629,17 +689,37 @@ optionsList.addEventListener('click', (event) => {
   handleAnswer(selectedIndex);
 });
 
-function handleAnswer(selectedIndex) {
+function handleAnswer(selectedIndex, fromTimeout = false) {
+  stopTimer();
   const current = state.questions[state.currentIndex];
   const correctIndex = current.options.findIndex((o) => o.isCorrect);
   const isCorrect = selectedIndex === correctIndex;
 
-  state.answers[state.currentIndex] = { selectedIndex, isCorrect };
+  state.answers[state.currentIndex] = { selectedIndex, isCorrect, timedOut: fromTimeout };
 
   lockOptions(selectedIndex);
   updatePips();
 
   nextBtn.disabled = false;
+
+  if (fromTimeout) {
+    // Beri jeda sebentar supaya warna jawaban benar/salah sempat terlihat,
+    // lalu otomatis lanjut ke soal berikutnya (atau selesaikan kuis).
+    setTimeout(advanceAfterTimeout, 1100);
+  }
+}
+
+function advanceAfterTimeout() {
+  // Guard: batal auto-lanjut kalau user sudah pindah layar/soal secara manual.
+  if (quizScreen.hidden) return;
+  if (!state.answers[state.currentIndex]) return;
+
+  if (state.currentIndex === state.questions.length - 1) {
+    finishQuiz();
+  } else {
+    state.currentIndex += 1;
+    renderQuestion();
+  }
 }
 
 function lockOptions(selectedIndex) {
@@ -677,6 +757,7 @@ nextBtn.addEventListener('click', () => {
 });
 
 function quitQuiz() {
+  stopTimer();
   state.categoryKey = null;
   state.questions = [];
   state.answers = [];
@@ -691,14 +772,18 @@ function quitQuiz() {
 // ==========================================================================
 
 function finishQuiz() {
-  const total = state.questions.length;
+  stopTimer();
+  let total = 0;
   let correct = 0;
   let earnedPoints = 0;
   let maxPoints = 0;
 
   state.questions.forEach((q, index) => {
-    maxPoints += q.points;
     const answer = state.answers[index];
+    if (answer && answer.timedOut) return; // soal timeout: tidak dihitung sama sekali
+
+    total += 1;
+    maxPoints += q.points;
     if (answer && answer.isCorrect) {
       correct += 1;
       earnedPoints += q.points;
